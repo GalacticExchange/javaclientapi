@@ -1,0 +1,47 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <groupId>io.gex</groupId>
+    <artifactId>client</artifactId>
+    <version>0.10.22</version>
+    <packaging>pom</packaging>
+
+    <profiles>
+        <profile>
+            <id>main</id>
+            <activation>
+                <activeByDefault>true</activeByDefault>
+            </activation>
+            <properties>
+                    <bundle.suffix>test</bundle.suffix>
+                    <prop.file.name>t_config.properties</prop.file.name>
+                    <kafka.host.port>log.devgex.net:9092</kafka.host.port>
+            </properties>
+        </profile>
+        <profile>
+            <id>prod</id>
+            <properties>
+                    <bundle.suffix></bundle.suffix>
+                    <prop.file.name>p_config.properties</prop.file.name>
+                    <kafka.host.port>log.galacticexchange.io:9092</kafka.host.port>
+            </properties>
+        </profile>
+    </profiles>
+
+    <modules>
+        <module>core</module>
+        <module>cli</module>
+        <module>gexd</module>
+        <module>ui</module>
+        <module>client-build</module>
+    </modules>
+
+    <pluginRepositories>
+        <pluginRepository>
+            <id>central</id>
+            <name>Central Repository</name>
+            <url>http://central.maven.org/maven2</url>
+        </pluginRepository>
+    </pluginRepositories>
+</project>

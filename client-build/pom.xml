@@ -1,0 +1,300 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <parent>
+        <groupId>io.gex</groupId>
+        <artifactId>client</artifactId>
+        <version>0.10.22</version>
+    </parent>
+
+    <artifactId>client-build</artifactId>
+    <packaging>pom</packaging>
+
+    <properties>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+    </properties>
+
+    <profiles>
+        <profile>
+            <id>all</id>
+            <activation>
+                <activeByDefault>true</activeByDefault>
+            </activation>
+            <properties>
+                <gex.build.ubuntu>true</gex.build.ubuntu>
+                <gex.build.centos>false</gex.build.centos>
+                <gex.build.dedicated>true</gex.build.dedicated>
+                <gex.build.mac>true</gex.build.mac>
+                <gex.build.windows>true</gex.build.windows>
+            </properties>
+        </profile>
+        <profile>
+            <id>ubuntu</id>
+            <properties>
+                <gex.build.ubuntu>true</gex.build.ubuntu>
+            </properties>
+        </profile>
+        <profile>
+            <id>centos</id>
+            <properties>
+                <gex.build.centos>true</gex.build.centos>
+            </properties>
+        </profile>
+        <profile>
+            <id>dedicated</id>
+            <properties>
+                <gex.build.dedicated>true</gex.build.dedicated>
+            </properties>
+        </profile>
+        <profile>
+            <id>mac</id>
+            <properties>
+                <gex.build.mac>true</gex.build.mac>
+            </properties>
+        </profile>
+        <profile>
+            <id>windows</id>
+            <properties>
+                <gex.build.windows>true</gex.build.windows>
+            </properties>
+        </profile>
+    </profiles>
+
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>build-helper-maven-plugin</artifactId>
+                <version>1.12</version>
+                <executions>
+                    <execution>
+                        <id>regex-property</id>
+                        <goals>
+                            <goal>regex-property</goal>
+                        </goals>
+                        <configuration>
+                            <name>project.clean.version</name>
+                            <value>${project.version}</value>
+                            <regex>-SNAPSHOT</regex>
+                            <failIfNoMatch>false</failIfNoMatch>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-antrun-plugin</artifactId>
+                <version>1.8</version>
+                <executions>
+                    <execution>
+                        <id>ubuntu</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>run</goal>
+                        </goals>
+                        <configuration>
+                            <target if="${gex.build.ubuntu}">
+                                <property name="ubuntuDirName" value="target/ubuntu"/>
+                                <copy file="resources/linux/gex.txt"
+                                      tofile="${ubuntuDirName}/usr/share/applications/gex.desktop"/>
+                                <copy todir="${ubuntuDirName}/usr/lib/gex/ui">
+                                    <fileset dir="../ui/target/ClusterGX-linux-x64"/>
+                                </copy>
+                                <copy todir="${ubuntuDirName}/usr/lib/gex/java">
+                                    <fileset dir="resources/linux/programs/java"/>
+                                </copy>
+                                <copy file="resources/linux/ssh_con.command"
+                                      todir="${ubuntuDirName}/usr/lib/gex"/>
+                                <copy file="../core/src/main/resources/checkVirtualization.sh"
+                                      todir="${ubuntuDirName}/usr/lib/gex"/>
+                                <copy file="../core/src/main/resources/success-or-shell.command"
+                                      todir="${ubuntuDirName}/usr/lib/gex"/>
+                                <copy file="../gexd/target/gexd.jar" todir="${ubuntuDirName}/usr/lib/gex"/>
+                                <copy file="resources/gexlogo.png" todir="${ubuntuDirName}/usr/lib/gex/ui"/>
+                                <copy file="resources/${prop.file.name}" tofile="${ubuntuDirName}/etc/gex/config.properties"/>
+
+                                <copy file="../cli/target/gex" todir="${ubuntuDirName}/usr/bin"/>
+                                <exec executable="/bin/bash" failonerror="true">
+                                    <arg value="-c"/>
+                                    <arg value="fpm -s dir -t deb --deb-no-default-config-files -n gex${bundle.suffix} -v ${project.clean.version} -d &quot;virtualbox&quot; -d &quot;vagrant(>= 1.9.0)&quot; -d &quot;supervisor&quot; -d &quot;msr-tools&quot; -d &quot;expect&quot; -d &quot;gksu&quot; -d &quot;aria2&quot; -d &quot;nmap&quot; --before-install resources/linux/before_install.sh --after-install resources/linux/after_install.sh --before-upgrade resources/linux/before_upgrade.sh --after-upgrade resources/linux/after_upgrade.sh --before-remove resources/linux/before_remove.sh --after-remove resources/linux/after_remove.sh -C ${ubuntuDirName} usr etc"/>
+                                </exec>
+                                <move file="gex${bundle.suffix}_${project.clean.version}_amd64.deb" todir="${ubuntuDirName}"/>
+                            </target>
+                        </configuration>
+                    </execution>
+
+                    <execution>
+                        <id>centos</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>run</goal>
+                        </goals>
+                        <configuration>
+                            <target if="${gex.build.centos}">
+                                <property name="centosDirName" value="target/centos"/>
+                                <copy file="resources/linux/gex.txt"
+                                      tofile="${centosDirName}/usr/share/applications/gex.desktop"/>
+                                <copy todir="${centosDirName}/usr/lib/gex/ui">
+                                    <fileset dir="../ui/target/ClusterGX-linux-x64"/>
+                                </copy>
+                                <copy todir="${centosDirName}/usr/lib/gex/java">
+                                    <fileset dir="resources/linux/programs/java"/>
+                                </copy>
+                                <copy file="resources/linux/supervisord" todir="${centosDirName}/usr/lib/gex"/>
+                                <copy file="resources/linux/gexd_centos.conf"
+                                      tofile="${centosDirName}/etc/supervisord.d/gexd.conf"/>
+                                <copy file="resources/linux/ssh_con.command"
+                                      todir="${centosDirName}/usr/lib/gex"/>
+                                <copy file="../core/src/main/resources/checkVirtualization.sh"
+                                      todir="${centosDirName}/usr/lib/gex"/>
+                                <copy file="../core/src/main/resources/success-or-shell.command"
+                                      todir="${centosDirName}/usr/lib/gex"/>
+                                <copy file="../gexd/target/gexd.jar" todir="${centosDirName}/usr/lib/gex"/>
+                                <copy file="resources/gexlogo.png" todir="${centosDirName}/usr/lib/gex/ui"/>
+                                <copy file="resources/${prop.file.name}" tofile="${centosDirName}/etc/gex/config.properties"/>
+
+                                <copy file="../cli/target/gex" todir="${centosDirName}/usr/bin"/>
+                                <exec executable="/bin/bash" failonerror="true">
+                                    <arg value="-c"/>
+                                    <arg value="fpm -s dir -t rpm -n gex${bundle.suffix} -v ${project.clean.version} -d &quot;python-setuptools&quot; --depends &#39;vagrant >= 1.9.0&#39; -d &quot;p7zip&quot; -d &quot;p7zip-plugins&quot; -d &quot;beesu&quot; -d &quot;expect&quot; -d &quot;msr-tools&quot; -d &quot;aria2&quot; --before-install resources/linux/before_install_centos.sh --after-install resources/linux/after_install_centos.sh --before-upgrade resources/linux/before_upgrade.sh --after-upgrade resources/linux/after_upgrade.sh --before-remove resources/linux/before_remove.sh --after-remove resources/linux/after_remove.sh -C ${centosDirName} usr etc"/>
+                                </exec>
+                                <move file="gex${bundle.suffix}-${project.clean.version}-1.x86_64.rpm" todir="${centosDirName}"/>
+                            </target>
+                        </configuration>
+                    </execution>
+
+                    <execution>
+                        <id>mac</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>run</goal>
+                        </goals>
+                        <configuration>
+                            <target if="${gex.build.mac}">
+                                <property name="macDirName" value="target/mac"/>
+                                <copy todir="${macDirName}/Applications/ClusterGX.app">
+                                    <fileset dir="../ui/target/ClusterGX-darwin-x64/ClusterGX.app"/>
+                                </copy>
+                                <copy todir="${macDirName}/Library/Application Support/gex/aria2">
+                                    <fileset dir="resources/mac/programs/aria2"/>
+                                </copy>
+                                <copy file="resources/mac/programs/java.tar.gz"
+                                      todir="${macDirName}/Library/Application Support/gex/"/>
+                                <copy file="../gexd/target/gexd.jar"
+                                      todir="${macDirName}/Library/Application Support/gex"/>
+                                <copy file="resources/linux/ssh_con.command"
+                                      todir="${macDirName}/Library/Application Support/gex"/>
+                                <copy file="../core/src/main/resources/success-or-shell.command"
+                                      todir="${macDirName}/Library/Application Support/gex"/>
+                                <copy file="resources/mac/exec.command"
+                                      todir="${macDirName}/Library/Application Support/gex"/>
+                                <copy file="resources/mac/exec_with_exit_code.sh"
+                                      todir="${macDirName}/Library/Application Support/gex"/>
+                                <copy file="resources/gexlogo.png" todir="${macDirName}"/>
+                                <copy file="resources/${prop.file.name}" tofile="${macDirName}/etc/gex/config.properties"/>
+                                <copy file="resources/disclaimer.txt" todir="${macDirName}"/>
+                                <copy file="../cli/target/gex" todir="${macDirName}/usr/local/bin"/>
+                                <copy file="resources/mac/io.galacticexchange.gexd.plist"
+                                      todir="${macDirName}/Library/LaunchDeamons"/>
+                                <copy file="resources/mac/before_install_mac.sh" todir="${macDirName}"/>
+                                <copy file="resources/mac/after_install_mac.sh" todir="${macDirName}"/>
+                                <copy file="resources/mac/build.sh" todir="${macDirName}"/>
+                                <replace file="${macDirName}/build.sh" token="{dmgname}" value="gex${bundle.suffix}_${project.clean.version}"/>
+                                <copy file="resources/mac/dmg.json" todir="${macDirName}"/>
+                                <copy file="resources/mac/uninstall.sh"
+                                      todir="${macDirName}/Library/Application Support/gex"/>
+                                <copy file="resources/mac/Vagrant_Uninstall.tool"
+                                      todir="${macDirName}/Library/Application Support/gex"/>
+                                <copy file="resources/mac/Vagrant_Uninstall.tool"
+                                      todir="${macDirName}"/>
+                                <copy file="resources/mac/VirtualBox_Uninstall.tool"
+                                      todir="${macDirName}/Library/Application Support/gex"/>
+                                <copy file="resources/mac/VirtualBox_Uninstall.tool"
+                                      todir="${macDirName}"/>
+                                <copy file="resources/mac/uninstall.tool" todir="${macDirName}"/>
+                                <copy file="resources/mac/uninstall.sh"
+                                      todir="${macDirName}/.data"/>
+                                <copy file="resources/mac/gexlogo.png"
+                                      todir="${macDirName}"/>
+                                <copy file="resources/mac/clustergx" todir="${macDirName}/usr/local/bin"/>
+                                <copy file="resources/mac/gex_n.pkgproj" todir="${macDirName}"/>
+                                <copy file="resources/mac/programs/ncat"
+                                      todir="${macDirName}/Library/Application Support/gex"/>
+                            </target>
+                        </configuration>
+                    </execution>
+
+                    <execution>
+                        <id>windows</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>run</goal>
+                        </goals>
+                        <configuration>
+                            <target if="${gex.build.windows}">
+                                <property name="windowsDirName" value="target/windows"/>
+                                <copy todir="${windowsDirName}/usr/lib/gex/ui">
+                                    <fileset dir="../ui/target/ClusterGX-win32-x64"/>
+                                </copy>
+                                <copy file="../gexd/target/gexd.jar" todir="${windowsDirName}/usr/lib/gex"/>
+                                <copy file="resources/${prop.file.name}" tofile="${windowsDirName}/etc/gex/config.properties"/>
+                                <copy file="../cli/target/gex.jar" todir="${windowsDirName}"/>
+                                <exec executable="/usr/local/bin/install4jc" failonerror="true">
+                                    <arg value="resources/windows_installer/win.install4j"/>
+                                    <arg value="--win-keystore-password"/>
+                                    <arg value="PH_GEX_PASSWD1"/>
+                                </exec>
+                                <move file="${windowsDirName}/gex_${project.clean.version}.exe"
+                                      tofile="${windowsDirName}/gex${bundle.suffix}_${project.clean.version}.exe"/>
+                            </target>
+                        </configuration>
+                    </execution>
+
+                    <execution>
+                        <id>dedicated</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>run</goal>
+                        </goals>
+                        <configuration>
+                            <target if="${gex.build.dedicated}">
+                                <property name="ubuntuDirName" value="target/dedicated"/>
+                                <copy file="resources/linux/gex.txt"
+                                      tofile="${ubuntuDirName}/usr/share/applications/gex.desktop"/>
+                                <copy todir="${ubuntuDirName}/usr/lib/gex/ui">
+                                    <fileset dir="../ui/target/ClusterGX-linux-x64"/>
+                                </copy>
+                                <copy todir="${ubuntuDirName}/usr/lib/gex/java">
+                                    <fileset dir="resources/linux/programs/java"/>
+                                </copy>
+                                <copy file="resources/linux/ssh_con.command"
+                                      todir="${ubuntuDirName}/usr/lib/gex"/>
+                                <copy file="../core/src/main/resources/checkVirtualization.sh"
+                                      todir="${ubuntuDirName}/usr/lib/gex"/>
+                                <copy file="../core/src/main/resources/success-or-shell.command"
+                                      todir="${ubuntuDirName}/usr/lib/gex"/>
+                                <copy file="../gexd/target/gexd.jar" todir="${ubuntuDirName}/usr/lib/gex"/>
+                                <copy file="resources/gexlogo.png" todir="${ubuntuDirName}/usr/lib/gex/ui"/>
+                                <copy file="resources/${prop.file.name}" tofile="${ubuntuDirName}/etc/gex/config.properties"/>
+                                <exec executable="/bin/bash" failonerror="true">
+                                    <arg value="-c"/>
+                                    <arg value="sed -i &quot;s/virtualbox/dedicated/g&quot; ${ubuntuDirName}/etc/gex/config.properties"/>
+                                </exec>
+
+                                <copy file="../cli/target/gex" todir="${ubuntuDirName}/usr/bin"/>
+                                <exec executable="/bin/bash" failonerror="true">
+                                    <arg value="-c"/>
+                                    <arg value="fpm -s dir -t deb --deb-no-default-config-files -n gexserver${bundle.suffix} -v ${project.clean.version} -d &quot;supervisor&quot; -d &quot;msr-tools&quot; -d &quot;expect&quot; -d &quot;gksu&quot; -d &quot;aria2&quot; -d &quot;nmap&quot; --after-install resources/linux/after_install.sh --before-upgrade resources/linux/before_upgrade.sh --after-upgrade resources/linux/after_upgrade.sh --before-remove resources/linux/before_remove.sh --after-remove resources/linux/after_remove.sh -C ${ubuntuDirName} usr etc"/>
+                                </exec>
+                                <move file="gexserver${bundle.suffix}_${project.clean.version}_amd64.deb" todir="${ubuntuDirName}"/>
+                            </target>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
+</project>

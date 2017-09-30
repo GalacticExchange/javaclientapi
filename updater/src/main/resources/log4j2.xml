@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Configuration status="INFO" name="GexUpdater" packages="io.gex">
+    <Properties>
+        <Property name="logFilename">${sys:user.home}/.gex/updater/gex_updater_log.log</Property>
+    </Properties>
+    <Appenders>
+        <RollingFile name="RollingFile" fileName="${logFilename}"
+                     filePattern="${logFilename}-%d{yyyy-MM-dd-HH-mm-ss}.log">
+            <PatternLayout>
+                <pattern>%d{yyyy-MM-dd HH:mm:ss} %-5p %C{1}:%L - %m%n</pattern>
+            </PatternLayout>
+            <Policies>
+                <SizeBasedTriggeringPolicy size="5 MB"/>
+            </Policies>
+            <DefaultRolloverStrategy max="10"/>
+        </RollingFile>
+    </Appenders>
+    <Loggers>
+        <Root level="error">
+            <AppenderRef ref="RollingFile"/>
+        </Root>
+        <Logger name="io.gex" level="info" additivity="false">
+            <AppenderRef ref="RollingFile"/>
+        </Logger>
+    </Loggers>
+</Configuration>

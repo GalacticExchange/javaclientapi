@@ -1,0 +1,44 @@
+{
+  "name": "ClusterGX",
+  "productName": "ClusterGX",
+  "version": "0.10.22",
+  "description": "ClustetGX UI",
+  "main": "main.js",
+  "scripts": {
+    "start": "electron main.js",
+    "pack-mac": "electron-packager . --asar --overwrite --platform=darwin --arch=x64 --icon=icons/gexlogo.icns --out=target --extend-info=info.plist",
+    "pack-win": "electron-packager . --asar --overwrite --platform=win32 --arch=x64 --icon=icons/gexlogo.ico --out=target --win32metadata.CompanyName='Galactic Exchange, Inc.' --win32metadata.FileDescription='ClusterGX' --win32metadata.ProductName='ClusterGX'",
+    "pack-linux": "electron-packager . --asar --overwrite --platform=linux --arch=x64 --icon=icons/gexlogo.png --out=target",
+    "package": "npm run pack-mac && npm run pack-win && npm run pack-linux"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/electron/electron-quick-start.git"
+  },
+  "keywords": [
+    "ClusterGX",
+    "UI"
+  ],
+  "author": "Galactic Exchange",
+  "license": "GPL-3.0",
+  "bugs": {
+    "url": "https://gex.myjetbrains.com/youtrack/issues"
+  },
+  "homepage": "http://galacticexchange.io/",
+  "devDependencies": {
+    "electron": "1.6.10",
+    "electron-packager": "8.7.2"
+  },
+  "dependencies": {
+    "properties": "1.2.1",
+    "restify-clients": "1.5.0",
+    "ssh2": "0.5.5",
+    "socksv5": "0.0.6",
+    "lodash": "4.17.4",
+    "electron-dl": "1.10.0",
+    "electron-is-dev": "0.3.0",
+    "fix-path": "2.1.0",
+    "strip-ansi": "4.0.0",
+    "iconv-lite": "0.4.18"
+  }
+}

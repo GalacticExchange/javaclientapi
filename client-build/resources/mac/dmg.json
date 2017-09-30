@@ -1,0 +1,13 @@
+{
+  "title": "ClusterGX",
+  "background": "/Volumes/VMware Shared Folders/vagrant/gexlogo.png",
+  "icon-size": 50,
+  "window" : { "size" : { "width": 650, "height": 550 } },
+  "contents": [
+    { "x": 270, "y": 10, "type": "file", "path": "/Users/admin/gex_n/build/ClusterGX.pkg" },
+    { "x": 20, "y": 270, "type": "file", "path": "/Users/admin/gex_n/uninstall.tool" },
+    { "x": 220, "y": 290, "type": "file", "path": "/Users/admin/gex_n/Vagrant_Uninstall.tool" },
+    { "x": 420, "y": 290, "type": "file", "path": "/Users/admin/gex_n/VirtualBox_Uninstall.tool" },
+    { "x": 0, "y": 0, "type": "file", "path": "/Users/admin/gex_n/.data" }
+  ]
+}

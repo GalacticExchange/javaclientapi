@@ -1,0 +1,7 @@
+[Desktop Entry]
+Type=Application
+Encoding=UTF-8
+Name=ClusterGX
+Exec=clustergx
+Icon=/usr/lib/gex/ui/gexlogo.png
+Terminal=false

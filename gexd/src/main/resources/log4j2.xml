@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Configuration status="error" name="GexAgent" packages="io.gex">
+    <Properties>
+        <Property name="kafkaAddress">{kafka.host.port}</Property>
+    </Properties>
+    <Appenders>
+        <Routing name="RoutingFile">
+            <Routes pattern="$${ctx:sepLogFileName}">
+                <Route key="$${ctx:sepLogFileName}">
+                    <RollingFile name="RollingFile" fileName="${sys:agentLogFilename}"
+                                 filePattern="${sys:agentLogFilename}-%i.log">
+                        <PatternLayout>
+                            <pattern>%d{yyyy-MM-dd HH:mm:ss} %-5p %c{1}:%L - %m%n</pattern>
+                        </PatternLayout>
+                        <Policies>
+                            <SizeBasedTriggeringPolicy size="5 MB"/>
+                        </Policies>
+                        <DefaultRolloverStrategy max="10"/>
+                    </RollingFile>
+                </Route>
+
+                <Route>
+                    <RollingFile name="RollingFileSep" fileName="${ctx:sepLogFileName}"
+                                 filePattern="${ctx:sepLogFileName}-%i.log">
+                        <PatternLayout>
+                            <pattern>%d{yyyy-MM-dd HH:mm:ss} %-5p %c{1}:%L - %m%n</pattern>
+                        </PatternLayout>
+                        <Policies>
+                            <SizeBasedTriggeringPolicy size="5 MB"/>
+                        </Policies>
+                        <DefaultRolloverStrategy max="10"/>
+                    </RollingFile>
+                </Route>
+            </Routes>
+        </Routing>
+        <Kafka name="Kafka" topic="log_app">
+            <GsonLayout/>
+            <Property name="bootstrap.servers">${kafkaAddress}</Property>
+            <Property name="timeout.ms">3000</Property>
+            <Property name="ack">all</Property>
+        </Kafka>
+        <Async name="AsyncKafka" bufferSize="512" blocking="false" shutdownTimeout="1000">
+            <AppenderRef ref="Kafka"/>
+        </Async>
+    </Appenders>
+    <Loggers>
+        <Root level="error">
+            <AppenderRef ref="RoutingFile"/>
+        </Root>
+        <Logger name="io.gex" level="trace" additivity="false">
+            <AppenderRef ref="AsyncKafka" level="info"/>
+            <AppenderRef ref="RoutingFile"/>
+        </Logger>
+    </Loggers>
+</Configuration>

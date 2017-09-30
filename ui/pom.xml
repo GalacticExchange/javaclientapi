@@ -1,0 +1,101 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <parent>
+        <groupId>io.gex</groupId>
+        <artifactId>client</artifactId>
+        <version>0.10.22</version>
+    </parent>
+
+    <artifactId>ui</artifactId>
+    <packaging>pom</packaging>
+
+    <properties>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+    </properties>
+
+    <profiles>
+        <profile>
+            <id>all</id>
+            <activation>
+                <activeByDefault>true</activeByDefault>
+            </activation>
+            <properties>
+                <gex.pack.command>package</gex.pack.command>
+            </properties>
+        </profile>
+        <profile>
+            <id>ubuntu</id>
+            <properties>
+                <gex.pack.command>pack-linux</gex.pack.command>
+            </properties>
+        </profile>
+        <profile>
+            <id>centos</id>
+            <properties>
+                <gex.pack.command>pack-linux</gex.pack.command>
+            </properties>
+        </profile>
+        <profile>
+            <id>dedicated</id>
+            <properties>
+                <gex.pack.command>pack-linux</gex.pack.command>
+            </properties>
+        </profile>
+        <profile>
+            <id>mac</id>
+            <properties>
+                <gex.pack.command>pack-mac</gex.pack.command>
+            </properties>
+        </profile>
+        <profile>
+            <id>windows</id>
+            <properties>
+                <gex.pack.command>pack-win</gex.pack.command>
+            </properties>
+        </profile>
+    </profiles>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-antrun-plugin</artifactId>
+                <version>1.8</version>
+                <executions>
+                    <execution>
+                        <id>npm-install</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>run</goal>
+                        </goals>
+                        <configuration>
+                            <target>
+                                <exec executable="npm" failonerror="true">
+                                    <arg value="install"/>
+                                </exec>
+                            </target>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>npm-package</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>run</goal>
+                        </goals>
+                        <configuration>
+                            <target if="gex.pack.command">
+                                <exec executable="npm" failonerror="true">
+                                    <arg value="run-script"/>
+                                    <arg value="${gex.pack.command}"/>
+                                </exec>
+                            </target>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
+</project>

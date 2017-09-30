@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<updateDescriptor baseUrl="">
+  <entry targetMediaFileId="25" updatableVersionMin="" updatableVersionMax="" fileName="gex_windows_0_1_0.exe" newVersion="0.1.0" newMediaFileId="25" fileSize="114852352" bundledJre="windows-x86-1.8.0_66" archive="false">
+    <comment language="en" />
+  </entry>
+</updateDescriptor>
